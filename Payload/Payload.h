@@ -1,11 +1,14 @@
 #ifndef Payload_h
 #define Payload_h
 
+//Needed in all Libraries
+#include "Arduino.h"
+
 //I2C/TWI Library
 #include <Wire.h>
 
 //Si7021 Library
-#include <SparkFun_Si7021.h>
+#include <SparkFunHTU21D.h>
 
 //SD Library
 #include <SD.h>
