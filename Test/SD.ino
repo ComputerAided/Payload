@@ -1,6 +1,6 @@
 /*****************************************************
  * SD.ino
- * Written By Joe Q
+ * Written By Joe Q. and Kenny H.
  * THE SOFTWARE IS PROVIDED "AS-IS", AND "WITH ALL FAULTS", 
  * WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
 *****************************************************/
