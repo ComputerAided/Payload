@@ -18,4 +18,7 @@
 //SPI Library
 #include <SPI.h>
 
+//GPS Library
+#include <TinyGPS.h>
+
 #endif
