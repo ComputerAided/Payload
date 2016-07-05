@@ -71,13 +71,6 @@ void printInfo() {
 
 }
 
-//functions for SD
-void initSD () {
-
-}
-void writeToSD () {
-  
-}
 
 //functions for GPS
 void pollSerial () {
