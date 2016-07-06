@@ -1,7 +1,6 @@
 /*****************************************************
  * Payload.ino
  * Written By Kenny H
- * THE SOFTWARE IS PROVIDED "AS-IS", AND "WITH ALL FAULTS", 
  * WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
 *****************************************************/
 #include <Payload.h> // includes for I2C, SPI, SD, Si7021, BMP180 and SPI
@@ -16,14 +15,6 @@ SFE_BMP180 pressure;
 //Si7021 temp, Si7021 Humidity, BMP180 temp, BMP180 pressure
 float weather[] = {0, 0, 0, 0};
 
-//GPS States
-enum states {
-  NO_READ,
-  READ
-};
-
-uint8_t state = NO_READ;
-
 void setup () {
   //enable sensors
   sensor.begin();
@@ -31,8 +22,7 @@ void setup () {
   
   //enable USB
   SerialUSB.begin(9600);
-  Serial1.begin(9600);
-  while (!Serial1 || !SerialUSB);
+  while (!SerialUSB);
 
   //Show setup is complete
   pinMode(13, OUTPUT);
@@ -43,27 +33,19 @@ void setup () {
 }
 
 void loop () {
-  switch (state) {
-    case READ: //tells to read from Serial1
-    {
-      String incomingString = Serial1.readStringUntil('*');
-      state = NO_READ;
-      SerialUSB.println(incomingString);
-      break;
-    } 
-    case NO_READ: //Does Other Stuff
-    {
-      pollSerial();
-      break;
-    }
-  }
+  
 }
 
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
-//function to read temp and humidity over Si7021
+//function to read temp and humidity and pressure over the sensors
 void getWeather() {
+  //gets data from the Si7021
+  float humd = sensor.readHumidity();
+  float temp = sensor.readTemperature();
 
+  weather[0] = temp;
+  weather[1] = humd;
 }
 
 //prints info from Si7021 - only for testing
@@ -71,16 +53,3 @@ void printInfo() {
 
 }
 
-
-//functions for GPS
-void pollSerial () {
-  if (Serial1.available() > 0) {
-    if (Serial1.find('R')){
-      if (Serial1.find('M')) {
-        if (Serial1.find('C')) {
-          state = READ;
-        }
-      }
-    }
-  }
-}
