@@ -15,7 +15,7 @@
 
 // Example variables to log - log these variables in the same .txt file multiple times.
 float weather[3] = {32.2, 20, 32.3, 30.13};
-
+double lat, lon;
 void setup () {
  SerialUSB.begin(9600);
  
@@ -39,11 +39,12 @@ void writeToSD
 
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
-
   if (dataFile) {
    for (int i = 0; i < 4; i++) {
     dataFile.println(weather[i]);
    }
+   dataFile.println(lon);
+   dataFile.println(lat);
     dataFile.close();
     
     SerialUSB.println(dataString);
