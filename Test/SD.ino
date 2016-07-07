@@ -19,8 +19,8 @@ String GPSData = "$GPRMC, 161229.487, A, 3723.24756, N, 12158.34162, W, 0.13, 30
 ";
 
 void setup() {
-  //t
-  Serial.begin("" FILE_WRITE);
+  //
+  Serial.begin(""9600);
   Serial.print("hello world");
   
  
@@ -31,7 +31,7 @@ void loop() {
  File fd;
   for (int i = 0; i < 4; i++) [
     fd.println(weather[i]);
-    File dataFile = payload.h.open () {
+    File dataFile = Payload.h.open () {
     if (datafile) {
-    }
+    dataFileln()
 }
