@@ -10,7 +10,7 @@
  * https://www.arduino.cc/en/Reference/SD
  * https://www.arduino.cc/en/Tutorial/Datalogger
 *****************************************************/
-//hi
+
 #include <Payload.h>
 
 // Example variables to log - log these variables in the same .txt file multiple times.
