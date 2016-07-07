@@ -31,7 +31,10 @@ void loop() {
  File fd;
   for (int i = 0; i < 4; i++) [
     fd.println(weather[i]);
-    File dataFile = Payload.h.open () {
+    
+    
+    File dataFile = .open () {
     if (datafile) {
-    dataFileln()
+    dataFileln("")
+    
 }
