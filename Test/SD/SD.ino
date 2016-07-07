@@ -45,9 +45,9 @@ void writeToSD
    }
    dataFile.println(lon);
    dataFile.println(lat);
-    dataFile.close();
+   dataFile.close();
     
-    SerialUSB.println(dataString);
+    SerialUSB.println("succesfully logged!");
   }
   
   else {
