@@ -15,43 +15,40 @@
 
 // Example variables to log - log these variables in the same .txt file multiple times.
 float weather[3] = {32.2, 20, 32.3, 30.13};
-String GPSData = "$GPRMC, 161229.487, A, 3723.24756, N, 12158.34162, W, 0.13, 309.62, 120598, ,*10
-";
-
-
-
-
-
-
 
 void setup () {
- Serial.print("Initializing SD card...");
+ SerialUSB.begin(9600);
+ 
+ SerialUSB.print("Initializing SD card...");
 
  
   if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
+    SerialUSB.println("Card failed, or not present");
    
     return;
   }
-  Serial.println("card initialized.");
+  SerialUSB.println("card initialized.");
 }
 }
 
 void loop () {
   
 }
-Void writeToSD
+
+void writeToSD
 
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
 
   if (dataFile) {
-    dataFile.println(dataString);
+   for (int i = 0; i < 4; i++) {
+    dataFile.println(weather[i]);
+   }
     dataFile.close();
     
-    Serial.println(dataString);
+    SerialUSB.println(dataString);
   }
   
   else {
-    Serial.println("error opening datalog.txt");
+    SerialUSB.println("error opening datalog.txt");
   }
