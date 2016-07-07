@@ -20,8 +20,9 @@ String GPSData = "$GPRMC, 161229.487, A, 3723.24756, N, 12158.34162, W, 0.13, 30
 
 void setup() {
   //t
-  Serial.begin();
+  Serial.begin("" FILE_WRITE);
   Serial.print("hello world");
+  
  
 } 
 
