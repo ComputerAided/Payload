@@ -17,13 +17,21 @@ SFE_BMP180 pressure;
 float weather[] = {0, 0, 0, 0};
 
 void setup () {
-  //enable sensors
-  sensor.begin();
-  pressure.begin();
-  
   //enable USB
   SerialUSB.begin(9600);
   while (!SerialUSB);
+
+  //enable sensors
+  sensor.begin();
+  //get calibration data from BMP180
+  if (pressure.begin())
+    SerialUSB.println("BMP180 Success");
+  else
+  {
+    SerialUSB.println("BMP180 init Fail");
+    while(1); //halt program
+  }
+  
 
   //Show setup is complete
   pinMode(13, OUTPUT);
@@ -47,6 +55,9 @@ void getWeather() {
 
   weather[0] = temp;
   weather[1] = humd;
+
+  //gets data from BMP180
+  
 }
 
 //prints info from Si7021 - only for testing
