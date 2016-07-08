@@ -15,6 +15,7 @@
 
 // Example variables to log - log these variables in the same .txt file multiple times.
 float weather[3] = {32.2, 20, 32.3, 30.13};
+<<<<<<< HEAD:Test/SD/SD.ino
 double lat, lon;
 void setup () {
  SerialUSB.begin(9600);
@@ -30,9 +31,30 @@ void setup () {
   SerialUSB.println("card initialized.");
 }
 }
+=======
+String GPSData = "$GPRMC, 161229.487, A, 3723.24756, N, 12158.34162, W, 0.13, 309.62, 120598, ,*10
+";
 
-void loop () {
+void setup() {
+  //
+  Serial.begin(""9600);
+  Serial.print("hello world");
   
+ 
+} 
+>>>>>>> Sensor-update:Test/SD.ino
+
+void loop() {
+  //
+ File fd;
+  for (int i = 0; i < 4; i++) [
+    fd.println(weather[i]);
+    
+    
+    File dataFile = .open () {
+    if (datafile) {
+    dataFileln("")
+    
 }
 
 void writeToSD
