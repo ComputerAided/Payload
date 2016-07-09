@@ -15,7 +15,6 @@
 
 // Example variables to log - log these variables in the same .txt file multiple times.
 float weather[3] = {32.2, 20, 32.3, 30.13};
-<<<<<<< HEAD:Test/SD/SD.ino
 double lat, lon;
 void setup () {
  SerialUSB.begin(9600);
