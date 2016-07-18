@@ -4,10 +4,36 @@
  * THE SOFTWARE IS PROVIDED "AS-IS", AND "WITH ALL FAULTS", 
  * WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
 *****************************************************/
-#include <Payload.h> // includes for I2C, SPI, SD, Si7021, BMP180 and SPI
-#define ALTITUDE 1655
 
-#define debug 1
+
+//#include <Payload.h> // includes for I2C, SPI, SD, Si7021, BMP180 and SPI
+
+
+
+//I2C/TWI Library
+#include <Wire.h>
+
+//Si7021 Library
+#include <SparkFunHTU21D.h>
+
+//BMP180
+#include <SFE_BMP180.h>
+
+//GPS Library
+#include <TinyGPS.h>
+
+
+
+#include <SoftwareSerial.h>
+
+#define FAIL 6
+#define NO_VALID_FIX 5
+#define debug 0
+#define readTime 1000
+#define intervalDelay 4000
+
+//Creates an instance of SoftwareSerial
+SoftwareSerial ss(4, 3);
 
 //Creates an instance for the Si7021
 HTU21D sensor;
@@ -17,12 +43,20 @@ SFE_BMP180 pressure;
 
 //variable to hold weather recordings
 //Si7021 temp, Si7021 Humidity, BMP180 temp, BMP180 pressure, Absolute Pressure
-float weather[] = {0, 0, 0, 0, 0};
+float weather[5] = {0, 0, 0, 0, 0};
+
+//Creates an instance of TinyGPS
+TinyGPS gps;
 
 void setup () {
-  //enable USB
+  //Enable status LEDs
+  pinMode(FAIL, OUTPUT);
+  pinMode(NO_VALID_FIX, HIGH);
+  
+  //enable Serial
   Serial.begin(9600);
   while (!Serial);
+  ss.begin(9600);
 
   //enable sensors
   sensor.begin();
@@ -32,30 +66,116 @@ void setup () {
   else
   {
     Serial.println("BMP180 init Fail");
+    digitalWrite(FAIL, HIGH);
     while(1); //halt program
   }
   
 
   //Show setup is complete
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
-  delay(1000);
-  digitalWrite(13, HIGH);
   Serial.println("Setup Complete");
+  Serial.println();
 }
 
 void loop () {
-  getWeather();
+  //GPS functions
+  float lat, lon, alt;
+  unsigned long age;
+
+  //gets position and prints over Serial
+  gps.f_get_position(&lat, &lon, &age);
+  printFloat(lat, TinyGPS::GPS_INVALID_F_ANGLE, 6, false);
+  Serial.print(',');
+  printFloat(lon, TinyGPS::GPS_INVALID_F_ANGLE, 6, true);
+  Serial.println(age);
+
+  //prints altitude
+  alt = gps.f_altitude();
+  printFloat(alt, TinyGPS::GPS_INVALID_ALTITUDE, 0, true);
+  
+  //prints time
+  printTime(gps);
+  
+  //weather functions
+  getWeather(alt);
   for (int i = 0; i < 5; i ++) {
     Serial.println(weather[i]);
   }
-  delay(5000);
+  Serial.println();
+  
+  delay(intervalDelay);
+  smartDelay(readTime);
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+// ------------------------ Functions ------------------------ //
+//prints Time over Serial
+void printTime (TinyGPS &gps) {
+  int year;
+  byte month, day, hour, minute, second, hundredths;
+  unsigned long age;
+
+  gps.crack_datetime(&year, &month, &day, &hour, &minute, &second, &hundredths, &age);
+  if (age == TinyGPS::GPS_INVALID_AGE) {
+    Serial.println("Time Not Valid");
+  } else {
+
+    if (hour > 5) {
+      hour -= 6;
+    } else {
+      hour -= 238;
+    }
+    
+    Serial.print(month);
+    Serial.print('/');
+    Serial.print(day);
+    Serial.print('/');
+    Serial.print(year);
+    Serial.print(' ');
+    Serial.print(hour);
+    Serial.print(':');
+    Serial.print(minute);
+    Serial.print(':');
+    Serial.print(second);
+    Serial.print(':');
+    Serial.println(hundredths);
+  }
+}
+
+//delays and encodes characters over Serial
+static void smartDelay(unsigned long ms)
+{
+  unsigned long start = millis();
+  do 
+  {
+    while (ss.available())
+      gps.encode(ss.read());
+  } while (millis() - start < ms);
+}
+
+//function to print floating point variables
+void printFloat (float val, float inval, int prec, bool nl) {
+  if (val == inval) {
+    digitalWrite(NO_VALID_FIX, HIGH);
+    if (nl == true) {
+      Serial.println("Not Valid");
+    } else {
+      Serial.print("Not Valid");
+    }
+      
+  } else {
+    if (nl == true) {
+      digitalWrite(NO_VALID_FIX, LOW);
+      Serial.println(val, prec);
+    } else {
+      Serial.print(val, prec);
+    }
+    
+  }
+}
+
 //function to read temp and humidity and pressure over the sensors
-void getWeather() {
+void getWeather(float ALTITUDE) {
   //gets data from the Si7021
   float humd = sensor.readHumidity();
   float temp = sensor.readTemperature();
