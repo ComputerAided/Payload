@@ -25,23 +25,21 @@ void setup () {
   if (!SD.begin(chipSelect)) {
     SerialUSB.println("Card failed, or not present");
    
-    return;
+    while(1);
   }
   SerialUSB.println("card initialized.");
 }
-}
-=======
+
 String GPSData = "$GPRMC, 161229.487, A, 3723.24756, N, 12158.34162, W, 0.13, 309.62, 120598, ,*10
 ";
 
 void setup() {
   //
-  Serial.begin(""9600);
+  Serial.begin(9600);
   Serial.print("hello world");
   
  
 } 
->>>>>>> Sensor-update:Test/SD.ino
 
 void loop() {
   //
