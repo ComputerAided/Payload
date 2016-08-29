@@ -7,6 +7,8 @@
  * 
  * Compiled Using Arduino IDE v1.6.5
  * 
+ * Assumed hardware is the Sparkfun Samd21 mini breakout
+ * 
 *****************************************************/
 
 //Dependency for HTU21D and BMP180
@@ -79,7 +81,7 @@ void setup() {
   //set this pin output
   pinMode(NO_VALID_FIX, OUTPUT);
 
-  delay(10800000);
+  delay(10800000); //delay 3 hrs
   pinMode(3, OUTPUT);
   digitalWrite(3, HIGH);
 }
@@ -109,15 +111,6 @@ void loop() {
     geoString += "position not valid";
     digitalWrite(NO_VALID_FIX, HIGH);
     pinMode(NO_VALID_FIX, HIGH);
-  } else if (age > 5000 && age != TinyGPS::GPS_INVALID_AGE) {
-    geoString += String(lat, 6);
-    geoString += ", ";
-    geoString += String(lon, 6);
-    geoString += ", ";
-    geoString += String(alt);
-    geoString += ", ";
-    geoString += String(age);
-    geoString += ", possible stale data";
   } else {
     geoString += String(lat, 6);
     geoString += ", ";
@@ -139,9 +132,9 @@ void loop() {
   dataString += String(bmp180[1]);
   dataString += ", ";
   dataString += String(bmp180[2]);
-  dataString += "\r\n";
+  dataString += ",";
   dataString += timeString;
-  dataString += "\r\n";
+  dataString += ",";
   dataString += geoString;
   dataString += "\r\n";
 
@@ -157,6 +150,7 @@ void loop() {
   smartdelay(1000);
 }
 
+//gets data from the Si7021
 void getHumidity () {
   float temp = sensor.readTemperature();
   float humd = sensor.readHumidity();
@@ -165,6 +159,7 @@ void getHumidity () {
   si7021[1] = humd;
 }
 
+//gets data from the bmp180
 void getAtmosphericPressure (float alt) {
   char status;
   double T, P, p0;
