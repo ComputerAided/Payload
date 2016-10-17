@@ -30,17 +30,19 @@
 // Writes data to the SD Card
 #include <SD.h>
 
+//Defines
 #define FAIL 5
 #define NO_VALID_FIX 6
 #define chipSelect 8
 
-
+//Constructors
 SFE_BMP180 pressure;
 HTU21D sensor;
 
 TinyGPS gps;
 File dataFile;
 
+//global variables
 volatile float si7021[2] = {0, 0};
 volatile double bmp180[3] = {0, 0, 0};
 
@@ -81,7 +83,7 @@ void setup() {
   //set this pin output
   pinMode(NO_VALID_FIX, OUTPUT);
 
-  delay(10800000); //delay 3 hrs
+  delay(10800000); //delay 3 hrs (Might be changed soon!)
   pinMode(3, OUTPUT);
   digitalWrite(3, HIGH);
 }
@@ -91,54 +93,7 @@ void loop() {
   getHumidity();
   getAtmosphericPressure(alt);
 
-
-  gps.crack_datetime(&year, &month, &day, &hour, &minute, &second, &hundredths, &age);
-
-  String timeString = "";
-  if (age == TinyGPS::GPS_INVALID_AGE) {
-    timeString += String("Time not valid");
-  } else {
-    char sz[32];
-    sprintf(sz, "%02d/%02d/%02d %02d:%02d:%02d.%02d", year, day, month, hour, minute, second, hundredths);
-    timeString += String(sz);
-  }
-
-  gps.f_get_position(&lat, &lon, &age);
-  alt = gps.f_altitude();
-
-  String geoString = "";
-  if (age == TinyGPS::GPS_INVALID_AGE) {
-    geoString += "position not valid";
-    digitalWrite(NO_VALID_FIX, HIGH);
-    pinMode(NO_VALID_FIX, HIGH);
-  } else {
-    geoString += String(lat, 6);
-    geoString += ", ";
-    geoString += String(lon, 6);
-    geoString += ", ";
-    geoString += String(alt, 6);
-    geoString += ", ";
-    geoString += String(age);
-    digitalWrite(NO_VALID_FIX, LOW);
-  }
-
-  String dataString = "";
-  dataString += String(si7021[0]);
-  dataString += ", ";
-  dataString += String(si7021[1]);
-  dataString += ", ";
-  dataString += String(bmp180[0]);
-  dataString += ", ";
-  dataString += String(bmp180[1]);
-  dataString += ", ";
-  dataString += String(bmp180[2]);
-  dataString += ",";
-  dataString += timeString;
-  dataString += ",";
-  dataString += geoString;
-  dataString += "\r\n";
-
-
+  String dataString = assembleString();
 
   
   dataFile = SD.open("test.txt", FILE_WRITE);
@@ -185,7 +140,7 @@ void getAtmosphericPressure (float alt) {
   bmp180[2] = p0;
 }
 
-
+//delay that collects GPS data
 void smartdelay (unsigned long ms) {
   unsigned long start = millis();
   do
@@ -195,3 +150,57 @@ void smartdelay (unsigned long ms) {
     }
   } while (millis() - start < ms);
 }
+
+//Assembles a string to write to the SD Card
+String assembleString() {
+  //Assembles the string with the time
+  String timeString = "";
+  if (age == TinyGPS::GPS_INVALID_AGE) {
+    timeString += 'n';
+  } else {
+    char sz[32];
+    sprintf(sz, "%02d/%02d/%02d %02d:%02d:%02d.%02d", year, day, month, hour, minute, second, hundredths);
+    timeString += String(sz);
+  }
+
+  //fetch lat, lon, and alt
+  gps.f_get_position(&lat, &lon, &age);
+  alt = gps.f_altitude();
+
+  //assemble string with geographic coordinates
+  String geoString = "";
+  if (age == TinyGPS::GPS_INVALID_AGE) {
+    geoString += "position not valid";
+    digitalWrite(NO_VALID_FIX, HIGH);
+    pinMode(NO_VALID_FIX, HIGH);
+  } else {
+    geoString += String(lat, 6);
+    geoString += ',';
+    geoString += String(lon, 6);
+    geoString += ',';
+    geoString += String(alt, 6);
+    geoString += ',';
+    geoString += String(age);
+    digitalWrite(NO_VALID_FIX, LOW);
+  }
+
+  //Assemble the final string that contains the data
+  String dataString = "";
+  dataString += String(si7021[0]);
+  dataString += ',';
+  dataString += String(si7021[1]);
+  dataString += ',';
+  dataString += String(bmp180[0]);
+  dataString += ',';
+  dataString += String(bmp180[1]);
+  dataString += ',';
+  dataString += String(bmp180[2]);
+  dataString += ',';
+  dataString += timeString;
+  dataString += ',';
+  dataString += geoString;
+  dataString += "\r\n";
+
+  return dataString;
+}
+
