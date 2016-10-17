@@ -170,7 +170,7 @@ String assembleString() {
   //assemble string with geographic coordinates
   String geoString = "";
   if (age == TinyGPS::GPS_INVALID_AGE) {
-    geoString += "position not valid";
+    geoString += "n,n,n,n";
     digitalWrite(NO_VALID_FIX, HIGH);
     pinMode(NO_VALID_FIX, HIGH);
   } else {
